@@ -2,6 +2,8 @@
  * Interactive Form, Treehouse FSJS Techdegree Project 3
  */
 
+"use strict";
+
 /**
  * Global variables
  */
@@ -11,6 +13,8 @@ const otherJobInput = document.getElementById('other-job-role');
 const selectJob = document.getElementById('title');
 const selectColor = document.getElementById('color');
 const selectDesign = document.getElementById('design');
+const activitiesSection = document.getElementById('activities');
+const totalActivitiesCost = document.getElementById('activities-cost');
 
 /**
  * focus on nameInput on page load 
@@ -60,4 +64,25 @@ selectDesign.addEventListener('change', (e) => {
             }
         }
 });
+
+/**
+ * Register for activities section
+ */
+
+activitiesSection.addEventListener('change', e => {
+    const activitiesCheckbox = document.querySelectorAll('#activities-box label input[type="checkbox"]');
+    let totalCost = 0;
+    let activitiesCount = 0;
+    for (let i = 0; i < activitiesCheckbox.length; i++) {
+        if (activitiesCheckbox[i].checked) {
+            const activityCost = activitiesCheckbox[i].getAttribute('data-cost');
+            totalCost += parseInt(activityCost);
+            activitiesCount += 1;
+            totalActivitiesCost.textContent = `Total: $${totalCost}`;
+        } else if (activitiesCount === 0) {
+            totalActivitiesCost.textContent = `Total: $0`;
+        }
+    }
+});
+
 
