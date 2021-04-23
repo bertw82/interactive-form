@@ -18,13 +18,13 @@ const activitiesSection = document.getElementById('activities');
 const activitiesCheckbox = document.querySelectorAll('#activities-box label input[type="checkbox"]');
 const totalActivitiesCost = document.getElementById('activities-cost');
 const selectPayment = document.getElementById('payment');
-const creditCardinfo = document.getElementById('credit-card');
+const creditCardInfo = document.getElementById('credit-card');
 const paypalAlert = document.getElementById('paypal');
 const bitcoinAlert = document.getElementById('bitcoin');
 const form = document.querySelector('form');
-const ccNumber = document.getElementById('cc-num');
-const zipNumber = document.getElementById('zip');
-const cvvNumber = document.getElementById('cvv');
+const ccNumInput = document.getElementById('cc-num');
+const zipNumInput = document.getElementById('zip');
+const cvvNumInput = document.getElementById('cvv');
 
 /**
  * focus on nameInput on page load 
@@ -108,15 +108,15 @@ bitcoinAlert.style.display = 'none';
 selectPayment.addEventListener('change', e => {
     for (let i = 0; i < selectPayment.options.length; i++) {
         if (e.target.value === 'paypal') {
-            creditCardinfo.style.display = 'none';
+            creditCardInfo.style.display = 'none';
             bitcoinAlert.style.display = 'none';
             paypalAlert.style.display = 'block';
         } else if ( e.target.value === 'bitcoin') {
-            creditCardinfo.style.display = 'none';
+            creditCardInfo.style.display = 'none';
             paypalAlert.style.display = 'none';
             bitcoinAlert.style.display = 'block';
         } else if (e.target.value === 'credit-card') {
-            creditCardinfo.style.display = 'block';
+            creditCardInfo.style.display = 'block';
             paypalAlert.style.display = 'none';
             bitcoinAlert.style.display = 'none';
         }
@@ -128,56 +128,81 @@ selectPayment.addEventListener('change', e => {
  */
 
 // Helper functions
-
-// Name validation 
-function nameValidator(name) {
-    const nameValue = name.value;
+function nameValidator() {
+    const nameValue = nameInput.value;
     const validName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?/.test(nameValue) /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
-    console.log(`Name validation test on "${nameValue}" evaluates to ${validName}`);
     return validName;
 }
 
-function emailValidator(email) {
-    const emailValue = email.value;
+function emailValidator() {
+    const emailValue = emailInput.value;
     const validEmail = /^[^@]+@[^@]+\.[a-z]+$/i.test(emailValue) /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
-    console.log(`Name validation test on "${emailValue}" evaluates to ${validEmail}`);
     return validEmail;
 }
 
-function activitiesRegisterValidator(activitiesChecked) {
+function activitiesRegisterValidator() {
     let count = 0;
-    for (let i = 0; i < activitiesChecked.length; i++) {
-        
-        if (activitiesChecked[i].checked) {
+    for (let i = 0; i < activitiesCheckbox.length; i++) { 
+        if (activitiesCheckbox[i].checked) {
             count += 1;
         }
     }
     const activitiesValid = count > 0;
-    console.log(`Name validation test on activities evaluates to ${activitiesValid}`);
     return activitiesValid;
 }
 
-function ccNumValidator(number) {
-    const ccNumValue = number.value;
+function ccNumValidator() {
+    const ccNumValue = ccNumInput.value;
     const validccNum = /^\d{13,16}$/.test(ccNumValue);
-    console.log(`Name validation test on "${ccNumValue}" evaluates to ${validccNum}`);
     return validccNum;
 }
 
+function zipCodeValidator() {
+    const zipCodeValue = zipNumInput.value;
+    const validZipCode = /^\d{5}$/.test(zipCodeValue);
+    return validZipCode;
+}
+
+function cvvValidator() {
+    const cvvValue = cvvNumInput.value;
+    const validCvv = /^\d{3}$/.test(cvvValue);
+    return validCvv;
+}
+// \Helper Functions
+
 form.addEventListener('submit', e => {
-    // e.preventDefault();
-    // nameValidator(nameInput);
-    // emailValidator(emailInput);
-    // activitiesRegisterValidator(activitiesCheckbox);
-    // ccNumValidator(ccNumber);
-    if (!nameValidator(nameInput)) {
+    if (!nameValidator()) {
         e.preventDefault();
         console.log('error validating name');
-      } else if (!emailValidator(emailInput)) {
+      } else if (!emailValidator()) {
         e.preventDefault();
         console.log('error validating email');
-      } else if (!activitiesRegisterValidator(activitiesCheckbox)) {
+      } else if (!activitiesRegisterValidator()) {
         e.preventDefault();
         console.log('error validating activities checked');
+      } else if (selectPayment.value === 'credit-card') {
+        if (!ccNumValidator()) {
+            e.preventDefault();
+            console.log('error validating credit-card number');
+        } else if (!zipCodeValidator()) {
+            e.preventDefault();
+            console.log('error validating zip code');
+        } else if (!cvvValidator()) {
+            e.preventDefault();
+            console.log('error validating CVV number');
+        }
       }
 });
+
+/**
+ * Listen for `focus` and `blur` events on the activities section checkboxes
+ */
+
+activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('focus', () => {
+    checkbox.parentNode.classList.add('focus');
+}));
+
+activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('blur', () => {
+    checkbox.parentNode.classList.remove('focus');
+}))
+
