@@ -26,6 +26,7 @@ const form = document.querySelector('form');
 const ccNumInput = document.getElementById('cc-num');
 const zipNumInput = document.getElementById('zip');
 const cvvNumInput = document.getElementById('cvv');
+const inputs = document.querySelectorAll('input');
 
 /**
  * focus on nameInput on page load 
@@ -168,6 +169,12 @@ function cvvValidator() {
     const validCvv = /^\d{3}$/.test(cvvValue);
     return validCvv;
 }
+
+function addRemoveDisplay(input) {
+    input.parentNode.classList.add('not-valid');
+    input.parentNode.classList.remove('valid');
+    input.parentNode.lastElementChild.style.display = 'block';
+}
 // \Helper Functions
 
 form.addEventListener('submit', e => {
@@ -175,15 +182,11 @@ form.addEventListener('submit', e => {
     if (!nameValidator()) {
         e.preventDefault();
         console.log('error validating name');
-        nameInput.parentNode.classList.add('not-valid');
-        nameInput.parentNode.classList.remove('valid');
-        nameInput.parentNode.lastElementChild.style.display = 'block';
+        addRemoveDisplay(nameInput);
       } else if (!emailValidator()) {
         e.preventDefault();
         console.log('error validating email');
-        emailInput.parentNode.classList.add('not-valid');
-        emailInput.parentNode.classList.remove('valid');
-        emailInput.parentNode.lastElementChild.style.display = 'block';
+        addRemoveDisplay(emailInput);
       } else if (!activitiesRegisterValidator()) {
         e.preventDefault();
         console.log('error validating activities checked');
@@ -191,19 +194,15 @@ form.addEventListener('submit', e => {
         if (!ccNumValidator()) {
             e.preventDefault();
             console.log('error validating credit-card number');
-            ccNumInput.parentNode.classList.add('not-valid');
-            ccNumInput.parentNode.classList.remove('valid');
-            ccNumInput.parentNode.lastElementChild.style.display = 'block';
+           addRemoveDisplay(ccNumInput);
         } else if (!zipCodeValidator()) {
             e.preventDefault();
             console.log('error validating zip code');
-            zipNumInput.parentNode.classList.add('not-valid');
-            zipNumInput.parentNode.classList.remove('valid');
-            zipNumInput.parentNode.lastElementChild.style.display = 'block';
+            addRemoveDisplay(zipNumInput);
         } else if (!cvvValidator()) {
             e.preventDefault();
             console.log('error validating CVV number');
-           
+            addRemoveDisplay(cvvNumInput);
         }
       }
 });
@@ -228,17 +227,23 @@ function highlightEmptyField() {
     const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
     inputArray.forEach(input => {
         if (input.value === '') {
-            input.parentNode.classList.add('not-valid');
-            input.parentNode.classList.remove('valid');
-            input.parentNode.lastElementChild.style.display = 'block';
+           addRemoveDisplay(input)
         } 
     });
     if (!activitiesRegisterValidator()) {
-        activitiesBox.parentNode.classList.add('not-valid');
-        activitiesBox.parentNode.classList.remove('valid');
-        activitiesBox.parentNode.lastElementChild.style.display = 'block';
+        addRemoveDisplay(activitiesBox);
     };
 };
+
+inputs.forEach(input => input.addEventListener('input', () => {
+    input.parentNode.classList.remove('not-valid');
+    input.parentNode.lastElementChild.style.display = 'none';
+}));
+
+activitiesCheckbox.forEach(box => box.addEventListener('change', () => {
+    box.parentNode.parentNode.parentNode.classList.remove('not-valid');
+    box.parentNode.parentNode.parentNode.lastElementChild.style.display = 'none';
+}));
 
 
 
