@@ -15,6 +15,7 @@ const selectJob = document.getElementById('title');
 const selectColor = document.getElementById('color');
 const selectDesign = document.getElementById('design');
 const activitiesSection = document.getElementById('activities');
+const activitiesBox = document.getElementById('activities-box');
 const activitiesCheckbox = document.querySelectorAll('#activities-box label input[type="checkbox"]');
 const totalActivitiesCost = document.getElementById('activities-cost');
 const selectPayment = document.getElementById('payment');
@@ -87,8 +88,6 @@ activitiesSection.addEventListener('change', e => {
             const activityCost = activitiesCheckbox[i].getAttribute('data-cost');
             totalCost += parseInt(activityCost);
             activitiesCount += 1;
-            console.log(activitiesCount);
-            console.log(totalCost);
             totalActivitiesCost.textContent = `Total: $${totalCost}`;
         } 
         else if (activitiesCount === 0) {
@@ -101,7 +100,8 @@ activitiesSection.addEventListener('change', e => {
  * Credit Card section: when any field other than credit card is selected, credit card fields disappear
  */
 
-// hide paypal and bitcoin sections
+// show credit card in select menu and hide paypal and bitcoin sections on page load
+selectPayment.options[1].selected = true;
 paypalAlert.style.display = 'none';
 bitcoinAlert.style.display = 'none';
 
@@ -124,7 +124,7 @@ selectPayment.addEventListener('change', e => {
 });
 
 /**
- * Form validation upon form submit: form logs an error in the console if anything is invalid
+ * Form validation upon form submit: if any required form field is invalid the console logs an error
  */
 
 // Helper functions
@@ -171,12 +171,19 @@ function cvvValidator() {
 // \Helper Functions
 
 form.addEventListener('submit', e => {
+    highlightEmptyField();
     if (!nameValidator()) {
         e.preventDefault();
         console.log('error validating name');
+        nameInput.parentNode.classList.add('not-valid');
+        nameInput.parentNode.classList.remove('valid');
+        nameInput.parentNode.lastElementChild.style.display = 'block';
       } else if (!emailValidator()) {
         e.preventDefault();
         console.log('error validating email');
+        emailInput.parentNode.classList.add('not-valid');
+        emailInput.parentNode.classList.remove('valid');
+        emailInput.parentNode.lastElementChild.style.display = 'block';
       } else if (!activitiesRegisterValidator()) {
         e.preventDefault();
         console.log('error validating activities checked');
@@ -184,12 +191,19 @@ form.addEventListener('submit', e => {
         if (!ccNumValidator()) {
             e.preventDefault();
             console.log('error validating credit-card number');
+            ccNumInput.parentNode.classList.add('not-valid');
+            ccNumInput.parentNode.classList.remove('valid');
+            ccNumInput.parentNode.lastElementChild.style.display = 'block';
         } else if (!zipCodeValidator()) {
             e.preventDefault();
             console.log('error validating zip code');
+            zipNumInput.parentNode.classList.add('not-valid');
+            zipNumInput.parentNode.classList.remove('valid');
+            zipNumInput.parentNode.lastElementChild.style.display = 'block';
         } else if (!cvvValidator()) {
             e.preventDefault();
             console.log('error validating CVV number');
+           
         }
       }
 });
@@ -204,5 +218,27 @@ activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('focus', () => 
 
 activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('blur', () => {
     checkbox.parentNode.classList.remove('focus');
-}))
+}));
+
+/**
+ * Helper function: if empty fields the required field is highlighted and given a `hint`
+ */
+
+function highlightEmptyField() {
+    const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
+    inputArray.forEach(input => {
+        if (input.value === '') {
+            input.parentNode.classList.add('not-valid');
+            input.parentNode.classList.remove('valid');
+            input.parentNode.lastElementChild.style.display = 'block';
+        } 
+    });
+    if (!activitiesRegisterValidator()) {
+        activitiesBox.parentNode.classList.add('not-valid');
+        activitiesBox.parentNode.classList.remove('valid');
+        activitiesBox.parentNode.lastElementChild.style.display = 'block';
+    };
+};
+
+
 
