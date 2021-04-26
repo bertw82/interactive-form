@@ -80,20 +80,59 @@ selectDesign.addEventListener('change', (e) => {
 /**
  * Register for activities section: when user clicks and unclicks on activities to sign up for, the total cost of the activities is updated 
  */
+
+// helper functions to add/remove `disabled` class
+function addDisabled(input) {
+    return input.parentNode.classList.add('disabled');
+}
+
+function removeDisabled(input) {
+    return input.parentNode.classList.remove('disabled');
+}
  
 activitiesSection.addEventListener('change', e => {
     let activitiesCount = 0;
     let totalCost = 0;
+    const jsLibs = document.querySelector('input[name="js-libs"]');
+    const jsFrameworks = document.querySelector('input[name="js-frameworks"]');
+    const node = document.querySelector('input[name="node"]');
+    const buildTools = document.querySelector('input[name="build-tools"]');
+
     for (let i = 0; i < activitiesCheckbox.length; i++) {
         if (activitiesCheckbox[i].checked) {
             const activityCost = activitiesCheckbox[i].getAttribute('data-cost');
             totalCost += parseInt(activityCost);
             activitiesCount += 1;
             totalActivitiesCost.textContent = `Total: $${totalCost}`;
-        } 
-        else if (activitiesCount === 0) {
+        } else if (activitiesCount === 0) {
             totalActivitiesCost.textContent = `Total: $0`;
-        }
+        } 
+    };
+
+    // add/remove `disabled` class to conflicting activities
+    if (jsLibs.checked) {
+        addDisabled(jsFrameworks);
+        removeDisabled(jsLibs);
+    } else if (!jsLibs.checked) {
+        removeDisabled(jsFrameworks);
+    };
+    if (jsFrameworks.checked) {
+        removeDisabled(jsFrameworks);
+        addDisabled(jsLibs);
+    } else if (!jsFrameworks.checked) {
+        removeDisabled(jsLibs);
+    };
+    if (node.checked) {
+        addDisabled(buildTools);
+        removeDisabled(node);
+    } else if (!node.checked) {
+        removeDisabled(buildTools);
+    };
+    if (buildTools.checked) {
+        addDisabled(node);
+        removeDisabled(buildTools);
+    } else if (!buildTools.checked) {
+        removeDisabled(node);
     }
 });
 
@@ -194,7 +233,7 @@ form.addEventListener('submit', e => {
         if (!ccNumValidator()) {
             e.preventDefault();
             console.log('error validating credit-card number');
-           addRemoveDisplay(ccNumInput);
+            addRemoveDisplay(ccNumInput);
         } else if (!zipCodeValidator()) {
             e.preventDefault();
             console.log('error validating zip code');
@@ -222,9 +261,9 @@ activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('blur', () => {
 /**
  * Helper function: if empty fields the required field is highlighted and given a `hint`
  */
+ const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
 
 function highlightEmptyField() {
-    const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
     inputArray.forEach(input => {
         if (input.value === '') {
            addRemoveDisplay(input)
@@ -235,7 +274,8 @@ function highlightEmptyField() {
     };
 };
 
-inputs.forEach(input => input.addEventListener('input', () => {
+// addEventListeners for input and checkboxes to remove `not-valid` upon input or check
+inputArray.forEach(input => input.addEventListener('input', () => {
     input.parentNode.classList.remove('not-valid');
     input.parentNode.lastElementChild.style.display = 'none';
 }));
@@ -245,5 +285,26 @@ activitiesCheckbox.forEach(box => box.addEventListener('change', () => {
     box.parentNode.parentNode.parentNode.lastElementChild.style.display = 'none';
 }));
 
+/**
+ * Real-time error messaging for credit-card: provide real-time messaging while the user inputs their information
+ */
 
+ccNumInput.addEventListener('keyup', () => {
+    if(!ccNumValidator()) {
+        addRemoveDisplay(ccNumInput);
+    }
+});
+
+/**
+ * Conditional error messaging for name: if a number is used a different error message will appear
+ */
+
+nameInput.addEventListener('keyup', () => {
+    const nameValue = nameInput.value;
+    const invalidName = /\d/.test(nameValue);
+    if (invalidName) {
+        addRemoveDisplay(nameInput);
+        nameInput.parentNode.lastElementChild.innerHTML = 'You cannot use digits in name';
+    }
+});
 

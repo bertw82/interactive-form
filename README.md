@@ -1,2 +1,5 @@
 # interactive-form
- Interactive form project for FSJS Techdegree
+ Interactive form project for Full Stack JavaScript Techdegree at Treehouse
+
+ 
+
