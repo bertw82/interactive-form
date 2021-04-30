@@ -83,11 +83,13 @@ selectDesign.addEventListener('change', (e) => {
 
 // helper functions to add/remove `disabled` class
 function addDisabled(input) {
-    return input.parentNode.classList.add('disabled');
+    input.parentNode.classList.add('disabled');
+    input.disabled = true;
 }
 
 function removeDisabled(input) {
-    return input.parentNode.classList.remove('disabled');
+    input.parentNode.classList.remove('disabled');
+    input.disabled = false;
 }
  
 activitiesSection.addEventListener('change', e => {
@@ -115,19 +117,19 @@ activitiesSection.addEventListener('change', e => {
         removeDisabled(jsLibs);
     } else if (!jsLibs.checked) {
         removeDisabled(jsFrameworks);
-    };
+    }
     if (jsFrameworks.checked) {
         removeDisabled(jsFrameworks);
         addDisabled(jsLibs);
     } else if (!jsFrameworks.checked) {
         removeDisabled(jsLibs);
-    };
+    }
     if (node.checked) {
         addDisabled(buildTools);
         removeDisabled(node);
     } else if (!node.checked) {
         removeDisabled(buildTools);
-    };
+    }
     if (buildTools.checked) {
         addDisabled(node);
         removeDisabled(buildTools);
@@ -170,13 +172,13 @@ selectPayment.addEventListener('change', e => {
 // Helper functions
 function nameValidator() {
     const nameValue = nameInput.value;
-    const validName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?/.test(nameValue) /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
+    const validName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?/.test(nameValue); /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
     return validName;
 }
 
 function emailValidator() {
     const emailValue = emailInput.value;
-    const validEmail = /^[^@]+@[^@]+\.[a-z]+$/i.test(emailValue) /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
+    const validEmail = /^[^@]+@[^@]+\.[a-z]+$/i.test(emailValue); /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
     return validEmail;
 }
 
@@ -209,36 +211,71 @@ function cvvValidator() {
     return validCvv;
 }
 
+function validInput(input) {
+    return input.parentNode.classList.add('valid');
+}
+
 function addRemoveDisplay(input) {
     input.parentNode.classList.add('not-valid');
     input.parentNode.classList.remove('valid');
     input.parentNode.lastElementChild.style.display = 'block';
 }
-// \Helper Functions
+
+function addValidClass() {
+    if (nameValidator()) {
+        validInput(nameInput);
+    }; 
+    if (emailValidator()) {
+        validInput(emailInput);
+    }; 
+    if (activitiesRegisterValidator()) {
+        validInput(activitiesBox);
+    }; 
+    if (selectPayment.value === 'credit-card') {
+        if (ccNumValidator()) {
+            validInput(ccNumInput);
+        };
+        if (zipCodeValidator()) {
+            validInput(zipNumInput);
+        };
+        if (cvvValidator()) {
+            validInput(cvvNumInput);
+        }
+    }
+}
+
+// Form submission addEventListener 
 
 form.addEventListener('submit', e => {
     highlightEmptyField();
+    addValidClass();
+
     if (!nameValidator()) {
         e.preventDefault();
         console.log('error validating name');
         addRemoveDisplay(nameInput);
-      } else if (!emailValidator()) {
+    };
+    if (!emailValidator()) {
         e.preventDefault();
         console.log('error validating email');
         addRemoveDisplay(emailInput);
-      } else if (!activitiesRegisterValidator()) {
+    };
+    if (!activitiesRegisterValidator()) {
         e.preventDefault();
         console.log('error validating activities checked');
-      } else if (selectPayment.value === 'credit-card') {
+    };
+    if (selectPayment.value === 'credit-card') {
         if (!ccNumValidator()) {
             e.preventDefault();
             console.log('error validating credit-card number');
             addRemoveDisplay(ccNumInput);
-        } else if (!zipCodeValidator()) {
+        };
+        if (!zipCodeValidator()) {
             e.preventDefault();
             console.log('error validating zip code');
             addRemoveDisplay(zipNumInput);
-        } else if (!cvvValidator()) {
+        };
+        if (!cvvValidator()) {
             e.preventDefault();
             console.log('error validating CVV number');
             addRemoveDisplay(cvvNumInput);
@@ -261,12 +298,13 @@ activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('blur', () => {
 /**
  * Helper function: if empty fields the required field is highlighted and given a `hint`
  */
+
  const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
 
 function highlightEmptyField() {
     inputArray.forEach(input => {
         if (input.value === '') {
-           addRemoveDisplay(input)
+           addRemoveDisplay(input);
         } 
     });
     if (!activitiesRegisterValidator()) {
