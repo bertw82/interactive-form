@@ -57,22 +57,18 @@ selectColor.setAttribute('disabled', '');
 selectDesign.addEventListener('change', (e) => {
     selectColor.removeAttribute('disabled');
         for (let i = 0; i < selectColor.options.length; i++) {
-            selectColor.options[0].selected = true;
-            selectColor.options[0].hidden = true;
-            const option = selectColor.options[i];
-            const optionDataTheme = option.getAttribute('data-theme');
             if (e.target.value === 'js puns') {
-                if (optionDataTheme === 'heart js') {
-                    option.style.display = 'none';
-                } else if (optionDataTheme === 'js puns'){
-                    option.style.display = 'initial';
-                }
+                selectColor.innerHTML = `
+                    <option data-theme="js puns" value="cornflowerblue">Cornflower Blue (JS Puns shirt only)</option>
+                    <option data-theme="js puns" value="darkslategrey">Dark Slate Grey (JS Puns shirt only)</option> 
+                    <option data-theme="js puns" value="gold">Gold (JS Puns shirt only)</option>
+                `;
             } else if (e.target.value === 'heart js') {
-                if (optionDataTheme === 'js puns') {
-                    option.style.display = 'none';
-                } else if (optionDataTheme === 'heart js') {
-                    option.style.display = 'initial';
-                }
+                selectColor.innerHTML = `
+                    <option data-theme="heart js" value="tomato">Tomato (I &#9829; JS shirt only)</option>
+                    <option data-theme="heart js" value="steelblue">Steel Blue (I &#9829; JS shirt only)</option> 
+                    <option data-theme="heart js" value="dimgrey">Dim Grey (I &#9829; JS shirt only)</option> 
+                `;
             }
         }
 });
@@ -172,13 +168,13 @@ selectPayment.addEventListener('change', e => {
 // Helper functions
 function nameValidator() {
     const nameValue = nameInput.value;
-    const validName = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?/.test(nameValue); /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
+    const validName = /.+/.test(nameValue); 
     return validName;
 }
 
 function emailValidator() {
     const emailValue = emailInput.value;
-    const validEmail = /^[^@]+@[^@]+\.[a-z]+$/i.test(emailValue); /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
+    const validEmail = /^[^@]+@[^@]+\.com$/i.test(emailValue); /* regex from Treehouse Form Input Validation 2 workspace by Robert Manolis */
     return validEmail;
 }
 
@@ -212,73 +208,64 @@ function cvvValidator() {
 }
 
 function validInput(input) {
-    return input.parentNode.classList.add('valid');
+    input.parentNode.className = 'valid';
 }
 
-function addRemoveDisplay(input) {
-    input.parentNode.classList.add('not-valid');
+function validActivities() {
+    activitiesSection.firstElementChild.className = 'valid';
+}
+
+function errorActivities() {
+    activitiesSection.firstElementChild.className = 'not-valid';
+    activitiesSection.firstElementChild.classList.remove('valid');
+    activitiesSection.lastElementChild.style.display = 'block';
+}
+
+function errorDisplayMessage(input) {
+    input.parentNode.className = 'not-valid';
     input.parentNode.classList.remove('valid');
     input.parentNode.lastElementChild.style.display = 'block';
 }
 
-function addValidClass() {
-    if (nameValidator()) {
-        validInput(nameInput);
-    }; 
-    if (emailValidator()) {
-        validInput(emailInput);
-    }; 
-    if (activitiesRegisterValidator()) {
-        validInput(activitiesBox);
-    }; 
-    if (selectPayment.value === 'credit-card') {
-        if (ccNumValidator()) {
-            validInput(ccNumInput);
-        };
-        if (zipCodeValidator()) {
-            validInput(zipNumInput);
-        };
-        if (cvvValidator()) {
-            validInput(cvvNumInput);
-        }
-    }
-}
-
 // Form submission addEventListener 
-
 form.addEventListener('submit', e => {
     highlightEmptyField();
-    addValidClass();
 
     if (!nameValidator()) {
         e.preventDefault();
-        console.log('error validating name');
-        addRemoveDisplay(nameInput);
-    };
+        errorDisplayMessage(nameInput);
+    } else {
+        validInput(nameInput);
+    }
     if (!emailValidator()) {
         e.preventDefault();
-        console.log('error validating email');
-        addRemoveDisplay(emailInput);
-    };
+        errorDisplayMessage(emailInput);
+    } else {
+        validInput(emailInput);
+    }
     if (!activitiesRegisterValidator()) {
         e.preventDefault();
-        console.log('error validating activities checked');
-    };
+    } else {
+        validActivities();
+    }
     if (selectPayment.value === 'credit-card') {
         if (!ccNumValidator()) {
             e.preventDefault();
-            console.log('error validating credit-card number');
-            addRemoveDisplay(ccNumInput);
-        };
+            errorDisplayMessage(ccNumInput);
+        } else {
+            validInput(ccNumInput);
+        }
         if (!zipCodeValidator()) {
             e.preventDefault();
-            console.log('error validating zip code');
-            addRemoveDisplay(zipNumInput);
-        };
+            errorDisplayMessage(zipNumInput);
+        } else {
+            validInput(zipNumInput);
+        }
         if (!cvvValidator()) {
             e.preventDefault();
-            console.log('error validating CVV number');
-            addRemoveDisplay(cvvNumInput);
+            errorDisplayMessage(cvvNumInput);
+        } else {
+            validInput(cvvNumInput);
         }
       }
 });
@@ -299,18 +286,18 @@ activitiesCheckbox.forEach(checkbox => checkbox.addEventListener('blur', () => {
  * Helper function: if empty fields the required field is highlighted and given a `hint`
  */
 
- const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
+const inputArray = [nameInput, emailInput, ccNumInput, zipNumInput, cvvNumInput];
 
 function highlightEmptyField() {
     inputArray.forEach(input => {
         if (input.value === '') {
-           addRemoveDisplay(input);
+           errorDisplayMessage(input);
         } 
     });
     if (!activitiesRegisterValidator()) {
-        addRemoveDisplay(activitiesBox);
-    };
-};
+        errorActivities();
+    }
+}
 
 // addEventListeners for input and checkboxes to remove `not-valid` upon input or check
 inputArray.forEach(input => input.addEventListener('input', () => {
@@ -319,30 +306,32 @@ inputArray.forEach(input => input.addEventListener('input', () => {
 }));
 
 activitiesCheckbox.forEach(box => box.addEventListener('change', () => {
-    box.parentNode.parentNode.parentNode.classList.remove('not-valid');
+    box.parentNode.parentNode.parentNode.firstElementChild.classList.remove('not-valid');
     box.parentNode.parentNode.parentNode.lastElementChild.style.display = 'none';
 }));
 
 /**
- * Real-time error messaging for credit-card: provide real-time messaging while the user inputs their information
+ * Real-time error messaging for email: provide real-time error validation messaging while the user inputs their information
  */
 
-ccNumInput.addEventListener('keyup', () => {
-    if(!ccNumValidator()) {
-        addRemoveDisplay(ccNumInput);
+ emailInput.addEventListener('keyup', () => {
+    if (!emailValidator()) {
+        errorDisplayMessage(emailInput);
+        emailInput.parentNode.lastElementChild.innerHTML = 'Email format requried: name@email.com';
     }
 });
 
 /**
- * Conditional error messaging for name: if a number is used a different error message will appear
+ * Conditional error messaging for credit-card: if a space or dash is used a different error message will appear below
  */
 
-nameInput.addEventListener('keyup', () => {
-    const nameValue = nameInput.value;
-    const invalidName = /\d/.test(nameValue);
-    if (invalidName) {
-        addRemoveDisplay(nameInput);
-        nameInput.parentNode.lastElementChild.innerHTML = 'You cannot use digits in name';
+ ccNumInput.addEventListener('keyup', () => {
+    const ccNumValue = ccNumInput.value;
+    const invalidNum = /[\s-]/.test(ccNumValue);
+    if (invalidNum) {
+        errorDisplayMessage(ccNumInput);
+        ccNumInput.parentNode.lastElementChild.innerHTML = 'Dashes or spaces not allowed';
     }
 });
+
 
